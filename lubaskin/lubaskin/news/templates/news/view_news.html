@@ -1,0 +1,60 @@
+{%extends 'base.html'%}
+
+{%block title%}
+{{object.title}}
+{%endblock%}
+
+{% block sidebar %}
+<!--{% include 'inc/_sidebar.html'%}-->
+{%endblock%}
+{% block content %}
+<div class="card mb-3">
+    <div class="card-header">
+        Категория: <a href="{{news_item.category.get_absolute_url}}">{{news_item.category}}</a>
+        <!--object из за detailview а так это == 'news_item'-->
+    </div>
+    <div class="card-body">
+        <div class="'media">
+            {% if news_item.photo %}
+            <img src="{{ news_item.photo.url }}" alt="" height="220" width="320" class="img-fluid img-left">
+            {%else%}
+            <img src="https://picsum.photos/id/2/300/200" alt="" class="img-fluid img-left">
+            {%endif%}
+            <div class="media-body">
+                <h5 class="card-title">{{news_item.title}}</h5>
+                <p class="card-text">{{news_item.content|safe}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer text-muted">
+        since of publicate: {{news_item.created_at|timesince}}
+    </div>
+</div>
+{%if request.user.is_authenticated%}
+{%with comments.count as total_comments%}
+<h4>
+    {{total_comments}} Комментариeв.
+</h4>
+{%endwith%}
+{%for comment in comments%}
+<div class="card mb-3">
+    <div class="card-header">
+        Комментарий от {{comment.name}}
+    </div>
+    <div class="card-text">
+        <div class="col">
+            <div class="p-3 border bg-light">{{comment.body|linebreaks}}</div>
+        </div>
+    </div>
+    <div class="card-footer text-muted">
+        {{comment.created}}
+    </div>
+</div>
+{%endfor%}
+<form action="." method="post">
+    {{comment_form.as_p}}
+    {%csrf_token%}
+    <button type="submit" class="btn btn-primary btn-block">Отправить комментарий</button>
+</form>
+{%endif%}
+{%endblock%}
